@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow – Modern Productivity & Task Planner</title>
+  <meta name="description" content="TaskFlow is a modern, responsive, and intuitive task management application designed for peak productivity. Organize, prioritize, and track tasks effortlessly.">
+  <meta name="theme-color" content="#4f46e5">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- App Layout Container -->
+  <div class="app-layout">
+    
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay" aria-hidden="true"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="sidebar" aria-label="Main Navigation">
+      <div class="sidebar-header">
+        <div class="brand">
+          <img src="assets/images/logo.svg" alt="TaskFlow Logo" class="brand-logo" width="36" height="36">
+          <div class="brand-text">
+            <span class="brand-name">TaskFlow</span>
+            <span class="brand-badge">PRO</span>
+          </div>
+        </div>
+        <button id="sidebarCloseBtn" class="btn-icon sidebar-close-btn" aria-label="Close navigation sidebar">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <!-- Quick Action in Sidebar -->
+      <div class="sidebar-action">
+        <button id="sidebarAddTaskBtn" class="btn btn-primary btn-block">
+          <i data-lucide="plus-circle"></i>
+          <span>Create New Task</span>
+        </button>
+      </div>
+
+      <!-- Navigation Views -->
+      <div class="sidebar-content">
+        <div class="nav-group">
+          <span class="nav-group-title">Views</span>
+          <nav class="nav-list" role="navigation" aria-label="Task Views">
+            <button class="nav-item active" data-view="all" aria-current="page">
+              <span class="nav-item-left">
+                <i data-lucide="layout-grid"></i>
+                <span>All Tasks</span>
+              </span>
+              <span class="nav-badge" id="badgeAll">0</span>
+            </button>
+            <button class="nav-item" data-view="active">
+              <span class="nav-item-left">
+                <i data-lucide="circle-dot"></i>
+                <span>Active</span>
+              </span>
+              <span class="nav-badge" id="badgeActive">0</span>
+            </button>
+            <button class="nav-item" data-view="completed">
+              <span class="nav-item-left">
+                <i data-lucide="check-circle-2"></i>
+                <span>Completed</span>
+              </span>
+              <span class="nav-badge" id="badgeCompleted">0</span>
+            </button>
+            <button class="nav-item" data-view="today">
+              <span class="nav-item-left">
+                <i data-lucide="calendar"></i>
+                <span>Due Today</span>
+              </span>
+              <span class="nav-badge" id="badgeToday">0</span>
+            </button>
+            <button class="nav-item" data-view="upcoming">
+              <span class="nav-item-left">
+                <i data-lucide="calendar-days"></i>
+                <span>Upcoming</span>
+              </span>
+              <span class="nav-badge" id="badgeUpcoming">0</span>
+            </button>
+          </nav>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="nav-group">
+          <div class="nav-group-header">
+            <span class="nav-group-title">Categories</span>
+          </div>
+          <div class="category-pills" id="sidebarCategoryPills">
+            <button class="cat-pill active" data-category="all">
+              <span class="cat-dot cat-dot-all"></span>
+              <span class="cat-name">All</span>
+            </button>
+            <button class="cat-pill" data-category="work">
+              <span class="cat-dot cat-dot-work"></span>
+              <span class="cat-name">Work</span>
+              <span class="cat-count" id="countWork">0</span>
+            </button>
+            <button class="cat-pill" data-category="personal">
+              <span class="cat-dot cat-dot-personal"></span>
+              <span class="cat-name">Personal</span>
+              <span class="cat-count" id="countPersonal">0</span>
+            </button>
+            <button class="cat-pill" data-category="study">
+              <span class="cat-dot cat-dot-study"></span>
+              <span class="cat-name">Study</span>
+              <span class="cat-count" id="countStudy">0</span>
+            </button>
+            <button class="cat-pill" data-category="finance">
+              <span class="cat-dot cat-dot-finance"></span>
+              <span class="cat-name">Finance</span>
+              <span class="cat-count" id="countFinance">0</span>
+            </button>
+            <button class="cat-pill" data-category="health">
+              <span class="cat-dot cat-dot-health"></span>
+              <span class="cat-name">Health</span>
+              <span class="cat-count" id="countHealth">0</span>
+            </button>
+            <button class="cat-pill" data-category="other">
+              <span class="cat-dot cat-dot-other"></span>
+              <span class="cat-name">Other</span>
+              <span class="cat-count" id="countOther">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Priority Filters -->
+        <div class="nav-group">
+          <span class="nav-group-title">Priority</span>
+          <div class="priority-pills" id="sidebarPriorityPills">
+            <button class="priority-pill active" data-priority="all">All</button>
+            <button class="priority-pill priority-high" data-priority="high">
+              <span class="p-dot high"></span> High
+            </button>
+            <button class="priority-pill priority-medium" data-priority="medium">
+              <span class="p-dot medium"></span> Medium
+            </button>
+            <button class="priority-pill priority-low" data-priority="low">
+              <span class="p-dot low"></span> Low
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="storage-indicator">
+          <span class="storage-status-dot"></span>
+          <span class="storage-text">Data synced to LocalStorage</span>
+        </div>
+        <div class="sidebar-footer-actions">
+          <button id="resetSampleDataBtn" class="btn btn-ghost btn-sm btn-block" title="Restore default sample tasks">
+            <i data-lucide="rotate-ccw"></i>
+            <span>Load Demo Tasks</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      
+      <!-- Top Application Header -->
+      <header class="app-header">
+        <div class="header-left">
+          <button id="sidebarToggleBtn" class="btn-icon mobile-toggle-btn" aria-label="Toggle navigation menu">
+            <i data-lucide="menu"></i>
+          </button>
+
+          <!-- Search Bar with Keyboard Shortcut & Clear -->
+          <div class="search-container">
+            <i data-lucide="search" class="search-icon"></i>
+            <input 
+              type="text" 
+              id="searchInput" 
+              class="search-input" 
+              placeholder="Search tasks by title or details..." 
+              autocomplete="off"
+              aria-label="Search tasks"
+            >
+            <kbd class="search-shortcut" title="Press '/' to focus search">/</kbd>
+            <button id="clearSearchBtn" class="btn-icon search-clear-btn hidden" aria-label="Clear search query">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Live Date & Clock Display -->
+          <div class="date-display" id="dateDisplay">
+            <i data-lucide="calendar"></i>
+            <span id="currentDateText">Loading date...</span>
+          </div>
+
+          <!-- Add Task Primary Button -->
+          <button id="openAddTaskModalBtn" class="btn btn-primary header-add-btn">
+            <i data-lucide="plus"></i>
+            <span>Add Task</span>
+          </button>
+
+          <!-- User Avatar Profile -->
+          <div class="user-profile" title="Signed in as Alex Morgan">
+            <div class="user-avatar">
+              <span>AM</span>
+              <span class="user-status-online" title="Online"></span>
+            </div>
+            <div class="user-meta">
+              <span class="user-name">Alex Morgan</span>
+              <span class="user-role">Productivity Pro</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Dashboard Content -->
+      <main class="dashboard-content" id="mainDashboard">
+        
+        <!-- Welcome Hero Section -->
+        <section class="welcome-banner" aria-label="Welcome Banner">
+          <div class="welcome-text-col">
+            <h1 class="welcome-title" id="greetingText">Welcome back, Alex! 👋</h1>
+            <p class="welcome-subtitle" id="greetingSubtitle">Organize your priorities, track execution, and achieve your daily goals.</p>
+          </div>
+          <div class="welcome-quick-stats">
+            <div class="quick-stat-badge">
+              <i data-lucide="sparkles"></i>
+              <span id="welcomeMotivation">Ready to accomplish great things today!</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Statistics Cards Grid -->
+        <section class="stats-section" aria-label="Task Statistics">
+          <div class="stats-grid">
+            
+            <!-- Card 1: Total Tasks -->
+            <div class="stat-card" data-stat="total">
+              <div class="stat-card-header">
+                <span class="stat-label">Total Tasks</span>
+                <div class="stat-icon-wrapper icon-total">
+                  <i data-lucide="clipboard-list"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="statTotal">0</div>
+              <div class="stat-meta">
+                <i data-lucide="layers" class="stat-meta-icon"></i>
+                <span>All logged items</span>
+              </div>
+            </div>
+
+            <!-- Card 2: Active Tasks -->
+            <div class="stat-card" data-stat="active">
+              <div class="stat-card-header">
+                <span class="stat-label">Active Tasks</span>
+                <div class="stat-icon-wrapper icon-active">
+                  <i data-lucide="clock"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="statActive">0</div>
+              <div class="stat-meta">
+                <i data-lucide="flame" class="stat-meta-icon text-amber"></i>
+                <span id="statActiveMeta">Pending action</span>
+              </div>
+            </div>
+
+            <!-- Card 3: Completed Tasks -->
+            <div class="stat-card" data-stat="completed">
+              <div class="stat-card-header">
+                <span class="stat-label">Completed</span>
+                <div class="stat-icon-wrapper icon-completed">
+                  <i data-lucide="check-circle-2"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="statCompleted">0</div>
+              <div class="stat-meta">
+                <i data-lucide="check" class="stat-meta-icon text-emerald"></i>
+                <span id="statCompletedMeta">Finished tasks</span>
+              </div>
+            </div>
+
+            <!-- Card 4: Completion Rate -->
+            <div class="stat-card" data-stat="rate">
+              <div class="stat-card-header">
+                <span class="stat-label">Completion Rate</span>
+                <div class="stat-icon-wrapper icon-rate">
+                  <i data-lucide="trophy"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="statRate">0%</div>
+              <div class="stat-meta">
+                <div class="mini-progress-track">
+                  <div class="mini-progress-bar" id="statMiniProgressBar" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Progress Overview Bar Section -->
+        <section class="progress-section" aria-label="Task Completion Progress">
+          <div class="progress-header">
+            <div class="progress-title-wrapper">
+              <span class="progress-title">Daily Completion Progress</span>
+              <span class="progress-caption" id="progressSummaryText">0 of 0 tasks completed</span>
+            </div>
+            <span class="progress-badge" id="progressPercentageBadge">0% Done</span>
+          </div>
+          <div class="progress-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="mainProgressBarAria">
+            <div class="progress-fill" id="mainProgressBarFill" style="width: 0%;"></div>
+          </div>
+        </section>
+
+        <!-- Task Management Controls & Filters Toolbar -->
+        <section class="toolbar-section" aria-label="Task Controls and Filters">
+          <div class="toolbar-top">
+            
+            <!-- Quick View Filter Tabs -->
+            <div class="filter-tabs" role="tablist" aria-label="Status Filters">
+              <button class="filter-tab active" data-tab="all" role="tab" aria-selected="true">
+                <i data-lucide="list"></i>
+                <span>All Tasks</span>
+              </button>
+              <button class="filter-tab" data-tab="active" role="tab" aria-selected="false">
+                <i data-lucide="clock"></i>
+                <span>Active</span>
+              </button>
+              <button class="filter-tab" data-tab="completed" role="tab" aria-selected="false">
+                <i data-lucide="check-check"></i>
+                <span>Completed</span>
+              </button>
+              <button class="filter-tab" data-tab="today" role="tab" aria-selected="false">
+                <i data-lucide="calendar"></i>
+                <span>Today</span>
+              </button>
+              <button class="filter-tab" data-tab="upcoming" role="tab" aria-selected="false">
+                <i data-lucide="calendar-days"></i>
+                <span>Upcoming</span>
+              </button>
+            </div>
+
+            <!-- View Style Toggle (List vs Grid) -->
+            <div class="view-toggles" aria-label="View Mode">
+              <button id="viewListBtn" class="btn-icon active" title="Switch to List View" aria-label="List View">
+                <i data-lucide="align-justify"></i>
+              </button>
+              <button id="viewGridBtn" class="btn-icon" title="Switch to Grid View" aria-label="Grid View">
+                <i data-lucide="layout-grid"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Secondary Toolbar: Dropdown Filters & Sort -->
+          <div class="toolbar-bottom">
+            <div class="toolbar-filters-group">
+              
+              <!-- Priority Filter Dropdown -->
+              <div class="select-wrapper">
+                <label for="filterPriority" class="sr-only">Filter by Priority</label>
+                <i data-lucide="flag" class="select-icon"></i>
+                <select id="filterPriority" class="custom-select" aria-label="Filter by priority">
+                  <option value="all">All Priorities</option>
+                  <option value="high">High Priority</option>
+                  <option value="medium">Medium Priority</option>
+                  <option value="low">Low Priority</option>
+                </select>
+              </div>
+
+              <!-- Category Filter Dropdown -->
+              <div class="select-wrapper">
+                <label for="filterCategory" class="sr-only">Filter by Category</label>
+                <i data-lucide="folder" class="select-icon"></i>
+                <select id="filterCategory" class="custom-select" aria-label="Filter by category">
+                  <option value="all">All Categories</option>
+                  <option value="work">Work</option>
+                  <option value="personal">Personal</option>
+                  <option value="study">Study</option>
+                  <option value="finance">Finance</option>
+                  <option value="health">Health</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <!-- Sort Dropdown -->
+              <div class="select-wrapper">
+                <label for="sortBy" class="sr-only">Sort Tasks</label>
+                <i data-lucide="arrow-up-down" class="select-icon"></i>
+                <select id="sortBy" class="custom-select" aria-label="Sort tasks">
+                  <option value="due-asc">Due Date (Earliest)</option>
+                  <option value="due-desc">Due Date (Latest)</option>
+                  <option value="priority-desc">Priority (Highest first)</option>
+                  <option value="priority-asc">Priority (Lowest first)</option>
+                  <option value="created-desc">Created Date (Newest)</option>
+                  <option value="created-asc">Created Date (Oldest)</option>
+                  <option value="title-asc">Title (A - Z)</option>
+                </select>
+              </div>
+
+            </div>
+
+            <!-- Batch Action Controls -->
+            <div class="toolbar-actions-group">
+              <button id="clearCompletedBtn" class="btn btn-secondary btn-sm" title="Remove all completed tasks">
+                <i data-lucide="trash-2"></i>
+                <span>Clear Completed</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Filter Badges Bar -->
+          <div id="activeFiltersBar" class="active-filters-bar hidden">
+            <span class="active-filter-label">Active filters:</span>
+            <div id="activeFilterTags" class="active-filter-tags"></div>
+            <button id="resetAllFiltersBtn" class="btn-link btn-sm">Clear all</button>
+          </div>
+        </section>
+
+        <!-- Tasks Listing Container -->
+        <section class="tasks-container" aria-label="Tasks List">
+          <div class="tasks-header-info">
+            <div class="tasks-count-info">
+              <h2 class="tasks-title" id="currentViewTitle">All Tasks</h2>
+              <span class="tasks-counter-chip" id="taskCountChip">0 tasks</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Task Cards List / Grid -->
+          <div id="taskList" class="task-list" role="list" aria-live="polite">
+            <!-- Task cards will be rendered dynamically by JavaScript -->
+          </div>
+
+          <!-- Empty State (Shown when no tasks match) -->
+          <div id="emptyState" class="empty-state hidden">
+            <div class="empty-state-illustration">
+              <div class="empty-icon-circle">
+                <i data-lucide="clipboard-check" class="empty-icon"></i>
+              </div>
+            </div>
+            <h3 class="empty-state-title" id="emptyStateTitle">No tasks found</h3>
+            <p class="empty-state-text" id="emptyStateDesc">There are no tasks matching your current view or filter criteria.</p>
+            <div class="empty-state-actions">
+              <button id="emptyStateActionBtn" class="btn btn-primary">
+                <i data-lucide="plus"></i>
+                <span>Add Your First Task</span>
+              </button>
+              <button id="emptyStateResetFilterBtn" class="btn btn-secondary hidden">
+                <i data-lucide="rotate-ccw"></i>
+                <span>Reset Filters</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- Application Footer -->
+      <footer class="app-footer">
+        <div class="footer-left">
+          <span>&copy; 2026 <strong>TaskFlow</strong> &bull; Crafted for Peak Productivity</span>
+        </div>
+        <div class="footer-right">
+          <span class="badge-keyboard">Press <kbd>N</kbd> for new task</span>
+          <span class="badge-keyboard">Press <kbd>/</kbd> to search</span>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- 1. ADD / EDIT TASK MODAL -->
+  <div id="taskModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-backdrop" id="taskModalBackdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-icon-badge" id="modalIconBadge">
+            <i data-lucide="plus" id="modalHeaderIcon"></i>
+          </div>
+          <div>
+            <h3 class="modal-title" id="modalTitle">Create New Task</h3>
+            <p class="modal-subtitle" id="modalSubtitle">Fill in the details to plan and track your task.</p>
+          </div>
+        </div>
+        <button id="modalCloseBtn" class="btn-icon modal-close-btn" aria-label="Close dialog">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <form id="taskForm" novalidate>
+        <div class="modal-body">
+          
+          <!-- Hidden input for edit mode -->
+          <input type="hidden" id="taskIdInput" value="">
+
+          <!-- Task Title Input -->
+          <div class="form-group">
+            <div class="label-row">
+              <label for="taskTitleInput" class="form-label required">Task Title</label>
+              <span class="char-counter" id="titleCharCount">0 / 100</span>
+            </div>
+            <div class="input-with-icon">
+              <i data-lucide="type" class="field-icon"></i>
+              <input 
+                type="text" 
+                id="taskTitleInput" 
+                class="form-input" 
+                placeholder="e.g., Deliver Q3 financial analysis report" 
+                maxlength="100" 
+                required
+                autocomplete="off"
+              >
+            </div>
+            <span class="field-error" id="titleError" aria-live="polite"></span>
+          </div>
+
+          <!-- Task Description Textarea -->
+          <div class="form-group">
+            <div class="label-row">
+              <label for="taskDescInput" class="form-label">Description <span class="label-opt">(Optional)</span></label>
+              <span class="char-counter" id="descCharCount">0 / 500</span>
+            </div>
+            <textarea 
+              id="taskDescInput" 
+              class="form-textarea" 
+              rows="3" 
+              placeholder="Provide context, deliverables, sub-steps, or references..." 
+              maxlength="500"
+            ></textarea>
+            <span class="field-error" id="descError" aria-live="polite"></span>
+          </div>
+
+          <!-- Row: Category & Due Date -->
+          <div class="form-row">
+            
+            <!-- Category Selection -->
+            <div class="form-group form-col">
+              <label for="taskCategoryInput" class="form-label required">Category</label>
+              <div class="input-with-icon">
+                <i data-lucide="folder" class="field-icon"></i>
+                <select id="taskCategoryInput" class="form-select" required>
+                  <option value="work">💼 Work</option>
+                  <option value="personal">🏠 Personal</option>
+                  <option value="study">📚 Study</option>
+                  <option value="finance">💳 Finance</option>
+                  <option value="health">🏃 Health</option>
+                  <option value="other">📌 Other</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Due Date Input -->
+            <div class="form-group form-col">
+              <label for="taskDueDateInput" class="form-label">Due Date <span class="label-opt">(Optional)</span></label>
+              <div class="input-with-icon">
+                <i data-lucide="calendar" class="field-icon"></i>
+                <input 
+                  type="date" 
+                  id="taskDueDateInput" 
+                  class="form-input"
+                >
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Priority Segmented Radio Selection -->
+          <div class="form-group">
+            <label class="form-label required">Priority Level</label>
+            <div class="priority-segmented-control" role="radiogroup" aria-label="Priority Selection">
+              
+              <label class="priority-option priority-low-option" for="priorityLow">
+                <input type="radio" name="taskPriority" id="priorityLow" value="low">
+                <span class="priority-custom-box">
+                  <span class="p-dot low"></span>
+                  <span class="p-label">Low</span>
+                </span>
+              </label>
+
+              <label class="priority-option priority-medium-option" for="priorityMedium">
+                <input type="radio" name="taskPriority" id="priorityMedium" value="medium" checked>
+                <span class="priority-custom-box">
+                  <span class="p-dot medium"></span>
+                  <span class="p-label">Medium</span>
+                </span>
+              </label>
+
+              <label class="priority-option priority-high-option" for="priorityHigh">
+                <input type="radio" name="taskPriority" id="priorityHigh" value="high">
+                <span class="priority-custom-box">
+                  <span class="p-dot high"></span>
+                  <span class="p-label">High</span>
+                </span>
+              </label>
+
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="modalCancelBtn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="modalSubmitBtn" class="btn btn-primary">
+            <i data-lucide="check"></i>
+            <span id="modalSubmitText">Create Task</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. DELETE CONFIRMATION MODAL -->
+  <div id="deleteModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle" aria-hidden="true">
+    <div class="modal-backdrop" id="deleteModalBackdrop"></div>
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-body confirm-modal-body">
+        <div class="confirm-icon-wrapper danger">
+          <i data-lucide="alert-triangle"></i>
+        </div>
+        <h3 class="confirm-title" id="deleteModalTitle">Delete Task?</h3>
+        <p class="confirm-text">Are you sure you want to delete this task? This action cannot be undone and will permanently remove it from your planner.</p>
+        <div class="confirm-preview-box">
+          <span class="preview-label">Task:</span>
+          <p class="preview-title" id="deleteTaskPreviewTitle">Task Title</p>
+        </div>
+      </div>
+      <div class="modal-footer confirm-footer">
+        <button type="button" id="cancelDeleteBtn" class="btn btn-secondary">Keep Task</button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">
+          <i data-lucide="trash-2"></i>
+          <span>Delete Permanently</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. CLEAR COMPLETED CONFIRMATION MODAL -->
+  <div id="clearCompletedModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="clearModalTitle" aria-hidden="true">
+    <div class="modal-backdrop" id="clearCompletedModalBackdrop"></div>
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-body confirm-modal-body">
+        <div class="confirm-icon-wrapper warning">
+          <i data-lucide="trash-2"></i>
+        </div>
+        <h3 class="confirm-title" id="clearModalTitle">Clear Completed Tasks?</h3>
+        <p class="confirm-text">This will permanently delete all finished tasks from your task list and reset their records.</p>
+        <div class="confirm-count-chip" id="clearCompletedCountChip">0 completed tasks will be deleted</div>
+      </div>
+      <div class="modal-footer confirm-footer">
+        <button type="button" id="cancelClearCompletedBtn" class="btn btn-secondary">Cancel</button>
+        <button type="button" id="confirmClearCompletedBtn" class="btn btn-danger">
+          <i data-lucide="trash-2"></i>
+          <span>Clear All Completed</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST NOTIFICATIONS CONTAINER ==================== -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Application Script -->
+  <script src="js/script.js"></script>
+</body>
+</html>
